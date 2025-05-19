@@ -146,9 +146,9 @@ jobs:
             let review = '';
 
             // Find the last assistant message which should contain the review
-            for (let i = executionLog.messages.length - 1; i >= 0; i--) {
-              if (executionLog.messages[i].role === 'assistant') {
-                review = executionLog.messages[i].content;
+            for (let i = executionLog.length - 1; i >= 0; i--) {
+              if (executionLog[i].role === 'assistant') {
+                review = executionLog[i].content;
                 break;
               }
             }
