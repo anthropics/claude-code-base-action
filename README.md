@@ -45,8 +45,8 @@ Add the following to your workflow file:
 | `disallowed_tools`  | Comma-separated list of disallowed tools that Claude Code cannot use                              | No       | ''                           |
 | `max_turns`         | Maximum number of conversation turns (default: no limit)                                          | No       | ''                           |
 | `mcp_config`        | Path to the MCP configuration JSON file                                                           | No       | ''                           |
-| `model`             | Model to use (provider-specific format required for Bedrock/Vertex)                               | No       | 'claude-3-7-sonnet-20250219' |
-| `anthropic_model`   | DEPRECATED: Use 'model' instead                                                                   | No       | 'claude-3-7-sonnet-20250219' |
+| `model`             | Model to use (provider-specific format required for Bedrock/Vertex)                               | No       | 'claude-4.0-sonnet'          |
+| `anthropic_model`   | DEPRECATED: Use 'model' instead                                                                   | No       | 'claude-4.0-sonnet'          |
 | `timeout_minutes`   | Timeout in minutes for Claude Code execution                                                      | No       | '10'                         |
 | `anthropic_api_key` | Anthropic API key (required for direct Anthropic API)                                             | No       | ''                           |
 | `use_bedrock`       | Use Amazon Bedrock with OIDC authentication instead of direct Anthropic API                       | No       | 'false'                      |
