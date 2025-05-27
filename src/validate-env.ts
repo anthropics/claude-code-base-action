@@ -5,22 +5,39 @@
 export function validateEnvironmentVariables() {
   const useBedrock = process.env.CLAUDE_CODE_USE_BEDROCK === "1";
   const useVertex = process.env.CLAUDE_CODE_USE_VERTEX === "1";
+  const useOAuth = process.env.CLAUDE_CODE_USE_OAUTH === "1";
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 
   const errors: string[] = [];
 
-  if (useBedrock && useVertex) {
+  // Check for multiple authentication methods
+  const authMethodsCount = [useBedrock, useVertex, useOAuth].filter(
+    Boolean,
+  ).length;
+  if (authMethodsCount > 1) {
     errors.push(
-      "Cannot use both Bedrock and Vertex AI simultaneously. Please set only one provider.",
+      "Cannot use multiple authentication methods simultaneously. Please set only one of: use_bedrock, use_vertex, or use_oauth.",
     );
   }
 
-  if (!useBedrock && !useVertex) {
+  if (!useBedrock && !useVertex && !useOAuth) {
     if (!anthropicApiKey) {
       errors.push(
         "ANTHROPIC_API_KEY is required when using direct Anthropic API.",
       );
     }
+  } else if (useOAuth) {
+    const requiredOAuthVars = {
+      CLAUDE_ACCESS_TOKEN: process.env.CLAUDE_ACCESS_TOKEN,
+      CLAUDE_REFRESH_TOKEN: process.env.CLAUDE_REFRESH_TOKEN,
+      CLAUDE_EXPIRES_AT: process.env.CLAUDE_EXPIRES_AT,
+    };
+
+    Object.entries(requiredOAuthVars).forEach(([key, value]) => {
+      if (!value) {
+        errors.push(`${key} is required when using OAuth authentication.`);
+      }
+    });
   } else if (useBedrock) {
     const requiredBedrockVars = {
       AWS_REGION: process.env.AWS_REGION,

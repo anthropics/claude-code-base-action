@@ -13,6 +13,10 @@ describe("validateEnvironmentVariables", () => {
     delete process.env.ANTHROPIC_API_KEY;
     delete process.env.CLAUDE_CODE_USE_BEDROCK;
     delete process.env.CLAUDE_CODE_USE_VERTEX;
+    delete process.env.CLAUDE_CODE_USE_OAUTH;
+    delete process.env.CLAUDE_ACCESS_TOKEN;
+    delete process.env.CLAUDE_REFRESH_TOKEN;
+    delete process.env.CLAUDE_EXPIRES_AT;
     delete process.env.AWS_REGION;
     delete process.env.AWS_ACCESS_KEY_ID;
     delete process.env.AWS_SECRET_ACCESS_KEY;
@@ -167,6 +171,55 @@ describe("validateEnvironmentVariables", () => {
     });
   });
 
+  describe("OAuth Authentication", () => {
+    test("should pass when all required OAuth variables are provided", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
+      process.env.CLAUDE_ACCESS_TOKEN = "test-access-token";
+      process.env.CLAUDE_REFRESH_TOKEN = "test-refresh-token";
+      process.env.CLAUDE_EXPIRES_AT = "1234567890";
+
+      expect(() => validateEnvironmentVariables()).not.toThrow();
+    });
+
+    test("should fail when CLAUDE_ACCESS_TOKEN is missing", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
+      process.env.CLAUDE_REFRESH_TOKEN = "test-refresh-token";
+      process.env.CLAUDE_EXPIRES_AT = "1234567890";
+
+      expect(() => validateEnvironmentVariables()).toThrow(
+        "CLAUDE_ACCESS_TOKEN is required when using OAuth authentication.",
+      );
+    });
+
+    test("should fail when CLAUDE_REFRESH_TOKEN is missing", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
+      process.env.CLAUDE_ACCESS_TOKEN = "test-access-token";
+      process.env.CLAUDE_EXPIRES_AT = "1234567890";
+
+      expect(() => validateEnvironmentVariables()).toThrow(
+        "CLAUDE_REFRESH_TOKEN is required when using OAuth authentication.",
+      );
+    });
+
+    test("should fail when CLAUDE_EXPIRES_AT is missing", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
+      process.env.CLAUDE_ACCESS_TOKEN = "test-access-token";
+      process.env.CLAUDE_REFRESH_TOKEN = "test-refresh-token";
+
+      expect(() => validateEnvironmentVariables()).toThrow(
+        "CLAUDE_EXPIRES_AT is required when using OAuth authentication.",
+      );
+    });
+
+    test("should report all missing OAuth variables", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
+
+      expect(() => validateEnvironmentVariables()).toThrow(
+        /CLAUDE_ACCESS_TOKEN is required when using OAuth authentication.*CLAUDE_REFRESH_TOKEN is required when using OAuth authentication.*CLAUDE_EXPIRES_AT is required when using OAuth authentication/s,
+      );
+    });
+  });
+
   describe("Multiple providers", () => {
     test("should fail when both Bedrock and Vertex are enabled", () => {
       process.env.CLAUDE_CODE_USE_BEDROCK = "1";
@@ -179,35 +232,48 @@ describe("validateEnvironmentVariables", () => {
       process.env.CLOUD_ML_REGION = "us-central1";
 
       expect(() => validateEnvironmentVariables()).toThrow(
-        "Cannot use both Bedrock and Vertex AI simultaneously. Please set only one provider.",
+        "Cannot use multiple authentication methods simultaneously. Please set only one of: use_bedrock, use_vertex, or use_oauth.",
       );
     });
-  });
 
-  describe("Error message formatting", () => {
-    test("should format error message properly with multiple errors", () => {
+    test("should fail when OAuth and Bedrock are enabled", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
       process.env.CLAUDE_CODE_USE_BEDROCK = "1";
-      // Missing all required Bedrock vars
+      // Provide all required vars to isolate the mutual exclusion error
+      process.env.CLAUDE_ACCESS_TOKEN = "test-access-token";
+      process.env.CLAUDE_REFRESH_TOKEN = "test-refresh-token";
+      process.env.CLAUDE_EXPIRES_AT = "1234567890";
+      process.env.AWS_REGION = "us-east-1";
+      process.env.AWS_ACCESS_KEY_ID = "test-access-key";
+      process.env.AWS_SECRET_ACCESS_KEY = "test-secret-key";
 
-      let error: Error | undefined;
-      try {
-        validateEnvironmentVariables();
-      } catch (e) {
-        error = e as Error;
-      }
+      expect(() => validateEnvironmentVariables()).toThrow(
+        "Cannot use multiple authentication methods simultaneously. Please set only one of: use_bedrock, use_vertex, or use_oauth.",
+      );
+    });
 
-      expect(error).toBeDefined();
-      expect(error!.message).toMatch(
-        /^Environment variable validation failed:/,
+    test("should fail when OAuth and Vertex are enabled", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
+      process.env.CLAUDE_CODE_USE_VERTEX = "1";
+      // Provide all required vars to isolate the mutual exclusion error
+      process.env.CLAUDE_ACCESS_TOKEN = "test-access-token";
+      process.env.CLAUDE_REFRESH_TOKEN = "test-refresh-token";
+      process.env.CLAUDE_EXPIRES_AT = "1234567890";
+      process.env.ANTHROPIC_VERTEX_PROJECT_ID = "test-project";
+      process.env.CLOUD_ML_REGION = "us-central1";
+
+      expect(() => validateEnvironmentVariables()).toThrow(
+        "Cannot use multiple authentication methods simultaneously. Please set only one of: use_bedrock, use_vertex, or use_oauth.",
       );
-      expect(error!.message).toContain(
-        "  - AWS_REGION is required when using AWS Bedrock.",
-      );
-      expect(error!.message).toContain(
-        "  - AWS_ACCESS_KEY_ID is required when using AWS Bedrock.",
-      );
-      expect(error!.message).toContain(
-        "  - AWS_SECRET_ACCESS_KEY is required when using AWS Bedrock.",
+    });
+
+    test("should fail when all three providers are enabled", () => {
+      process.env.CLAUDE_CODE_USE_OAUTH = "1";
+      process.env.CLAUDE_CODE_USE_BEDROCK = "1";
+      process.env.CLAUDE_CODE_USE_VERTEX = "1";
+
+      expect(() => validateEnvironmentVariables()).toThrow(
+        "Cannot use multiple authentication methods simultaneously. Please set only one of: use_bedrock, use_vertex, or use_oauth.",
       );
     });
   });

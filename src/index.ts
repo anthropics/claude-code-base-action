@@ -4,10 +4,20 @@ import * as core from "@actions/core";
 import { preparePrompt } from "./prepare-prompt";
 import { runClaude } from "./run-claude";
 import { validateEnvironmentVariables } from "./validate-env";
+import { setupOAuthCredentials } from "./setup-oauth";
 
 async function run() {
   try {
     validateEnvironmentVariables();
+
+    // Setup OAuth credentials if using OAuth authentication
+    if (process.env.CLAUDE_CODE_USE_OAUTH === "1") {
+      await setupOAuthCredentials({
+        accessToken: process.env.CLAUDE_ACCESS_TOKEN!,
+        refreshToken: process.env.CLAUDE_REFRESH_TOKEN!,
+        expiresAt: process.env.CLAUDE_EXPIRES_AT!,
+      });
+    }
 
     const promptConfig = await preparePrompt({
       prompt: process.env.INPUT_PROMPT || "",
