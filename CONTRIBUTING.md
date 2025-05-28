@@ -113,7 +113,7 @@ When modifying the action:
    - Creating a test repository
    - Using your branch as the action source:
      ```yaml
-     uses: your-username/claude-code-base-action@your-branch
+     uses: rgreed14xiv/claude-code-base-action@beta
      ```
 
 ### Debugging
