@@ -98,4 +98,34 @@ describe("prepareRunConfig", () => {
       "3",
     ]);
   });
+
+  describe("maxTurns validation", () => {
+    test("should accept valid maxTurns value", () => {
+      const options: ClaudeOptions = { maxTurns: "5" };
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.claudeArgs).toContain("--max-turns");
+      expect(prepared.claudeArgs).toContain("5");
+    });
+
+    test("should throw error for non-numeric maxTurns", () => {
+      const options: ClaudeOptions = { maxTurns: "abc" };
+      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
+        'maxTurns must be a positive number, got: abc'
+      );
+    });
+
+    test("should throw error for negative maxTurns", () => {
+      const options: ClaudeOptions = { maxTurns: "-1" };
+      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
+        'maxTurns must be a positive number, got: -1'
+      );
+    });
+
+    test("should throw error for zero maxTurns", () => {
+      const options: ClaudeOptions = { maxTurns: "0" };
+      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
+        'maxTurns must be a positive number, got: 0'
+      );
+    });
+  });
 });
