@@ -38,7 +38,9 @@ export function prepareRunConfig(
   if (options.maxTurns) {
     const maxTurnsNum = parseInt(options.maxTurns, 10);
     if (isNaN(maxTurnsNum) || maxTurnsNum <= 0) {
-      throw new Error(`maxTurns must be a positive number, got: ${options.maxTurns}`);
+      throw new Error(
+        `maxTurns must be a positive number, got: ${options.maxTurns}`,
+      );
     }
     claudeArgs.push("--max-turns", options.maxTurns);
   }

@@ -110,21 +110,21 @@ describe("prepareRunConfig", () => {
     test("should throw error for non-numeric maxTurns", () => {
       const options: ClaudeOptions = { maxTurns: "abc" };
       expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
-        'maxTurns must be a positive number, got: abc'
+        "maxTurns must be a positive number, got: abc",
       );
     });
 
     test("should throw error for negative maxTurns", () => {
       const options: ClaudeOptions = { maxTurns: "-1" };
       expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
-        'maxTurns must be a positive number, got: -1'
+        "maxTurns must be a positive number, got: -1",
       );
     });
 
     test("should throw error for zero maxTurns", () => {
       const options: ClaudeOptions = { maxTurns: "0" };
       expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
-        'maxTurns must be a positive number, got: 0'
+        "maxTurns must be a positive number, got: 0",
       );
     });
   });
