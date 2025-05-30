@@ -1,4 +1,4 @@
-name: Claude PR Agent
+name: Claude Code
 
 on:
   issue_comment:
@@ -7,16 +7,21 @@ on:
     types: [created]
   issues:
     types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
-  claude-pr:
+  claude:
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: read
+      issues: read
       id-token: write
     steps:
       - name: Checkout repository
@@ -24,11 +29,10 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Run Claude PR Agent
-        uses: anthropics/claude-code-action@main
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@beta
         with:
-          timeout_minutes: "60"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash(bun run:*),Bash(bun install),Bash(bun test:*)"
-          custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test) for testing your changes."
+          allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
+          custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
