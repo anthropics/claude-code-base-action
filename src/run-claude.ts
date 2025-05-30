@@ -16,6 +16,8 @@ export type ClaudeOptions = {
   disallowedTools?: string;
   maxTurns?: string;
   mcpConfig?: string;
+  systemPrompt?: string;
+  appendSystemPrompt?: string;
 };
 
 type PreparedConfig = {
@@ -46,6 +48,12 @@ export function prepareRunConfig(
   }
   if (options.mcpConfig) {
     claudeArgs.push("--mcp-config", options.mcpConfig);
+  }
+  if (options.systemPrompt) {
+    claudeArgs.push("--system-prompt", options.systemPrompt);
+  }
+  if (options.appendSystemPrompt) {
+    claudeArgs.push("--append-system-prompt", options.appendSystemPrompt);
   }
 
   return {
