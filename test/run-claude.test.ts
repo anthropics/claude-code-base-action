@@ -75,12 +75,15 @@ describe("prepareRunConfig", () => {
 
   test("should include append system prompt in command arguments", () => {
     const options: ClaudeOptions = {
-      appendSystemPrompt: "After writing code, be sure to code review yourself.",
+      appendSystemPrompt:
+        "After writing code, be sure to code review yourself.",
     };
     const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
 
     expect(prepared.claudeArgs).toContain("--append-system-prompt");
-    expect(prepared.claudeArgs).toContain("After writing code, be sure to code review yourself.");
+    expect(prepared.claudeArgs).toContain(
+      "After writing code, be sure to code review yourself.",
+    );
   });
 
   test("should use provided prompt path", () => {
