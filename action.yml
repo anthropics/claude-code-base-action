@@ -31,11 +31,11 @@ inputs:
     required: false
     default: ""
   system_prompt:
-    description: "Override system prompt (only works with print mode)"
+    description: "Override system prompt"
     required: false
     default: ""
   append_system_prompt:
-    description: "Append to system prompt (only works with print mode)"
+    description: "Append to system prompt"
     required: false
     default: ""
   model:

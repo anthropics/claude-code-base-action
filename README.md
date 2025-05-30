@@ -34,7 +34,7 @@ Add the following to your workflow file:
     max_turns: "5" # Limit conversation to 5 turns
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
-# Using custom system prompts (only works with print mode)
+# Using custom system prompts
 - name: Run Claude Code with custom system prompt
   uses: anthropics/claude-code-base-action@beta
   with:
@@ -63,8 +63,8 @@ Add the following to your workflow file:
 | `disallowed_tools`     | Comma-separated list of disallowed tools that Claude Code cannot use                              | No       | ''                           |
 | `max_turns`            | Maximum number of conversation turns (default: no limit)                                          | No       | ''                           |
 | `mcp_config`           | Path to the MCP configuration JSON file                                                           | No       | ''                           |
-| `system_prompt`        | Override system prompt (only works with print mode)                                               | No       | ''                           |
-| `append_system_prompt` | Append to system prompt (only works with print mode)                                              | No       | ''                           |
+| `system_prompt`        | Override system prompt                                                                             | No       | ''                           |
+| `append_system_prompt` | Append to system prompt                                                                            | No       | ''                           |
 | `model`                | Model to use (provider-specific format required for Bedrock/Vertex)                               | No       | 'claude-3-7-sonnet-20250219' |
 | `anthropic_model`      | DEPRECATED: Use 'model' instead                                                                   | No       | 'claude-3-7-sonnet-20250219' |
 | `timeout_minutes`      | Timeout in minutes for Claude Code execution                                                      | No       | '10'                         |
