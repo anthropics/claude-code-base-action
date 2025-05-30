@@ -63,6 +63,29 @@ describe("prepareRunConfig", () => {
     expect(prepared.claudeArgs).toContain("/path/to/mcp-config.json");
   });
 
+  test("should include system prompt in command arguments", () => {
+    const options: ClaudeOptions = {
+      systemPrompt: "You are a senior backend engineer.",
+    };
+    const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+
+    expect(prepared.claudeArgs).toContain("--system-prompt");
+    expect(prepared.claudeArgs).toContain("You are a senior backend engineer.");
+  });
+
+  test("should include append system prompt in command arguments", () => {
+    const options: ClaudeOptions = {
+      appendSystemPrompt:
+        "After writing code, be sure to code review yourself.",
+    };
+    const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+
+    expect(prepared.claudeArgs).toContain("--append-system-prompt");
+    expect(prepared.claudeArgs).toContain(
+      "After writing code, be sure to code review yourself.",
+    );
+  });
+
   test("should use provided prompt path", () => {
     const options: ClaudeOptions = {};
     const prepared = prepareRunConfig("/custom/prompt/path.txt", options);
@@ -78,6 +101,8 @@ describe("prepareRunConfig", () => {
     expect(prepared.claudeArgs).not.toContain("--disallowedTools");
     expect(prepared.claudeArgs).not.toContain("--max-turns");
     expect(prepared.claudeArgs).not.toContain("--mcp-config");
+    expect(prepared.claudeArgs).not.toContain("--system-prompt");
+    expect(prepared.claudeArgs).not.toContain("--append-system-prompt");
   });
 
   test("should preserve order of claude arguments", () => {
