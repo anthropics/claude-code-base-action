@@ -22,6 +22,7 @@ async function run() {
       disallowedTools: process.env.INPUT_DISALLOWED_TOOLS,
       maxTurns: process.env.INPUT_MAX_TURNS,
       mcpConfig: process.env.INPUT_MCP_CONFIG,
+      claudeEnv: process.env.INPUT_CLAUDE_ENV,
     });
   } catch (error) {
     core.setFailed(`Action failed with error: ${error}`);
