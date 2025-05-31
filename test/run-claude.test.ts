@@ -153,4 +153,69 @@ describe("prepareRunConfig", () => {
       );
     });
   });
+
+  describe("custom environment variables", () => {
+    test("should parse empty claudeEnv correctly", () => {
+      const options: ClaudeOptions = { claudeEnv: "" };
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.env).toEqual({});
+    });
+
+    test("should parse single environment variable", () => {
+      const options: ClaudeOptions = { claudeEnv: "API_KEY: secret123" };
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.env).toEqual({ API_KEY: "secret123" });
+    });
+
+    test("should parse multiple environment variables", () => {
+      const options: ClaudeOptions = {
+        claudeEnv: "API_KEY: secret123\nDEBUG: true\nUSER: testuser"
+      };
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.env).toEqual({
+        API_KEY: "secret123",
+        DEBUG: "true",
+        USER: "testuser"
+      });
+    });
+
+    test("should handle environment variables with spaces around values", () => {
+      const options: ClaudeOptions = {
+        claudeEnv: "API_KEY:  secret123  \n  DEBUG  :  true  "
+      };
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.env).toEqual({
+        API_KEY: "secret123",
+        DEBUG: "true"
+      });
+    });
+
+    test("should skip empty lines and comments", () => {
+      const options: ClaudeOptions = {
+        claudeEnv: "API_KEY: secret123\n\n# This is a comment\nDEBUG: true\n# Another comment"
+      };
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.env).toEqual({
+        API_KEY: "secret123",
+        DEBUG: "true"
+      });
+    });
+
+    test("should skip lines without colons", () => {
+      const options: ClaudeOptions = {
+        claudeEnv: "API_KEY: secret123\nINVALID_LINE\nDEBUG: true"
+      };
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.env).toEqual({
+        API_KEY: "secret123",
+        DEBUG: "true"
+      });
+    });
+
+    test("should handle undefined claudeEnv", () => {
+      const options: ClaudeOptions = {};
+      const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+      expect(prepared.env).toEqual({});
+    });
+  });
 });

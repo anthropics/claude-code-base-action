@@ -18,12 +18,46 @@ export type ClaudeOptions = {
   mcpConfig?: string;
   systemPrompt?: string;
   appendSystemPrompt?: string;
+  claudeEnv?: string;
 };
 
 type PreparedConfig = {
   claudeArgs: string[];
   promptPath: string;
+  env: Record<string, string>;
 };
+
+function parseCustomEnvVars(claudeEnv?: string): Record<string, string> {
+  if (!claudeEnv || claudeEnv.trim() === "") {
+    return {};
+  }
+
+  const customEnv: Record<string, string> = {};
+
+  // Split by lines and parse each line as KEY: VALUE
+  const lines = claudeEnv.split("\n");
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (trimmedLine === "" || trimmedLine.startsWith("#")) {
+      continue; // Skip empty lines and comments
+    }
+
+    const colonIndex = trimmedLine.indexOf(":");
+    if (colonIndex === -1) {
+      continue; // Skip lines without colons
+    }
+
+    const key = trimmedLine.substring(0, colonIndex).trim();
+    const value = trimmedLine.substring(colonIndex + 1).trim();
+
+    if (key) {
+      customEnv[key] = value;
+    }
+  }
+
+  return customEnv;
+}
 
 export function prepareRunConfig(
   promptPath: string,
@@ -56,9 +90,13 @@ export function prepareRunConfig(
     claudeArgs.push("--append-system-prompt", options.appendSystemPrompt);
   }
 
+  // Parse custom environment variables
+  const customEnv = parseCustomEnvVars(options.claudeEnv);
+
   return {
     claudeArgs,
     promptPath,
+    env: customEnv,
   };
 }
 
@@ -86,6 +124,12 @@ export async function runClaude(promptPath: string, options: ClaudeOptions) {
 
   console.log(`Prompt file size: ${promptSize} bytes`);
 
+  // Log custom environment variables if any
+  if (Object.keys(config.env).length > 0) {
+    const envKeys = Object.keys(config.env).join(", ");
+    console.log(`Custom environment variables: ${envKeys}`);
+  }
+
   // Output to console
   console.log(`Running Claude with prompt from file: ${config.promptPath}`);
 
@@ -103,6 +147,10 @@ export async function runClaude(promptPath: string, options: ClaudeOptions) {
 
   const claudeProcess = spawn("claude", config.claudeArgs, {
     stdio: ["pipe", "pipe", "inherit"],
+    env: {
+      ...process.env,
+      ...config.env,
+    },
   });
 
   // Handle Claude process errors

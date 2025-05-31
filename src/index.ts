@@ -24,6 +24,7 @@ async function run() {
       mcpConfig: process.env.INPUT_MCP_CONFIG,
       systemPrompt: process.env.INPUT_SYSTEM_PROMPT,
       appendSystemPrompt: process.env.INPUT_APPEND_SYSTEM_PROMPT,
+      claudeEnv: process.env.INPUT_CLAUDE_ENV,
     });
   } catch (error) {
     core.setFailed(`Action failed with error: ${error}`);
