@@ -51,6 +51,18 @@ Add the following to your workflow file:
     append_system_prompt: "After writing code, be sure to code review yourself."
     allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool"
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+# Using custom environment variables
+- name: Run Claude Code with custom environment variables
+  uses: anthropics/claude-code-base-action@beta
+  with:
+    prompt: "Deploy to staging environment"
+    claude_env: |
+      ENVIRONMENT: staging
+      API_URL: https://api-staging.example.com
+      DEBUG: true
+    allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool"
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
 ## Inputs
@@ -65,6 +77,7 @@ Add the following to your workflow file:
 | `mcp_config`           | Path to the MCP configuration JSON file                                                           | No       | ''                           |
 | `system_prompt`        | Override system prompt                                                                            | No       | ''                           |
 | `append_system_prompt` | Append to system prompt                                                                           | No       | ''                           |
+| `claude_env`           | Custom environment variables to pass to Claude Code execution (YAML multiline format)            | No       | ''                           |
 | `model`                | Model to use (provider-specific format required for Bedrock/Vertex)                               | No       | 'claude-3-7-sonnet-20250219' |
 | `anthropic_model`      | DEPRECATED: Use 'model' instead                                                                   | No       | 'claude-3-7-sonnet-20250219' |
 | `timeout_minutes`      | Timeout in minutes for Claude Code execution                                                      | No       | '10'                         |
@@ -100,6 +113,58 @@ Example usage:
   with:
     prompt: "Your prompt here"
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+## Custom Environment Variables
+
+You can pass custom environment variables to Claude Code execution using the `claude_env` input. This allows Claude to access environment-specific configuration during its execution.
+
+The `claude_env` input accepts YAML multiline format with key-value pairs:
+
+```yaml
+- name: Deploy with custom environment
+  uses: anthropics/claude-code-base-action@beta
+  with:
+    prompt: "Deploy the application to the staging environment"
+    claude_env: |
+      ENVIRONMENT: staging
+      API_BASE_URL: https://api-staging.example.com
+      DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
+      DEBUG: true
+      LOG_LEVEL: debug
+    allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool"
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### Features:
+
+- **YAML Format**: Use standard YAML key-value syntax (`KEY: value`)
+- **Multiline Support**: Define multiple environment variables in a single input
+- **Comments**: Lines starting with `#` are ignored
+- **GitHub Secrets**: Can reference GitHub secrets using `${{ secrets.SECRET_NAME }}`
+- **Runtime Access**: Environment variables are available to Claude during execution
+
+### Example Use Cases:
+
+```yaml
+# Development configuration
+claude_env: |
+  NODE_ENV: development
+  API_URL: http://localhost:3000
+  DEBUG: true
+
+# Production deployment
+claude_env: |
+  NODE_ENV: production
+  API_URL: https://api.example.com
+  DATABASE_URL: ${{ secrets.PROD_DB_URL }}
+  REDIS_URL: ${{ secrets.REDIS_URL }}
+  
+# Feature flags and configuration
+claude_env: |
+  FEATURE_NEW_UI: enabled
+  MAX_RETRIES: 3
+  TIMEOUT_MS: 5000
 ```
 
 ## Using MCP Config
