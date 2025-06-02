@@ -25,7 +25,7 @@ jobs:
             VAR1: value1
             # Another comment
             VAR2: value2
-            
+
             # Empty lines above should be ignored
           allowed_tools: "Bash(echo:*)"
           timeout_minutes: "2"

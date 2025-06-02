@@ -169,46 +169,47 @@ describe("prepareRunConfig", () => {
 
     test("should parse multiple environment variables", () => {
       const options: ClaudeOptions = {
-        claudeEnv: "API_KEY: secret123\nDEBUG: true\nUSER: testuser"
+        claudeEnv: "API_KEY: secret123\nDEBUG: true\nUSER: testuser",
       };
       const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
       expect(prepared.env).toEqual({
         API_KEY: "secret123",
         DEBUG: "true",
-        USER: "testuser"
+        USER: "testuser",
       });
     });
 
     test("should handle environment variables with spaces around values", () => {
       const options: ClaudeOptions = {
-        claudeEnv: "API_KEY:  secret123  \n  DEBUG  :  true  "
+        claudeEnv: "API_KEY:  secret123  \n  DEBUG  :  true  ",
       };
       const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
       expect(prepared.env).toEqual({
         API_KEY: "secret123",
-        DEBUG: "true"
+        DEBUG: "true",
       });
     });
 
     test("should skip empty lines and comments", () => {
       const options: ClaudeOptions = {
-        claudeEnv: "API_KEY: secret123\n\n# This is a comment\nDEBUG: true\n# Another comment"
+        claudeEnv:
+          "API_KEY: secret123\n\n# This is a comment\nDEBUG: true\n# Another comment",
       };
       const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
       expect(prepared.env).toEqual({
         API_KEY: "secret123",
-        DEBUG: "true"
+        DEBUG: "true",
       });
     });
 
     test("should skip lines without colons", () => {
       const options: ClaudeOptions = {
-        claudeEnv: "API_KEY: secret123\nINVALID_LINE\nDEBUG: true"
+        claudeEnv: "API_KEY: secret123\nINVALID_LINE\nDEBUG: true",
       };
       const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
       expect(prepared.env).toEqual({
         API_KEY: "secret123",
-        DEBUG: "true"
+        DEBUG: "true",
       });
     });
 
