@@ -77,7 +77,7 @@ Add the following to your workflow file:
 | `mcp_config`           | Path to the MCP configuration JSON file                                                           | No       | ''                           |
 | `system_prompt`        | Override system prompt                                                                            | No       | ''                           |
 | `append_system_prompt` | Append to system prompt                                                                           | No       | ''                           |
-| `claude_env`           | Custom environment variables to pass to Claude Code execution (YAML multiline format)            | No       | ''                           |
+| `claude_env`           | Custom environment variables to pass to Claude Code execution (YAML multiline format)             | No       | ''                           |
 | `model`                | Model to use (provider-specific format required for Bedrock/Vertex)                               | No       | 'claude-3-7-sonnet-20250219' |
 | `anthropic_model`      | DEPRECATED: Use 'model' instead                                                                   | No       | 'claude-3-7-sonnet-20250219' |
 | `timeout_minutes`      | Timeout in minutes for Claude Code execution                                                      | No       | '10'                         |
@@ -159,7 +159,7 @@ claude_env: |
   API_URL: https://api.example.com
   DATABASE_URL: ${{ secrets.PROD_DB_URL }}
   REDIS_URL: ${{ secrets.REDIS_URL }}
-  
+
 # Feature flags and configuration
 claude_env: |
   FEATURE_NEW_UI: enabled
