@@ -38,7 +38,7 @@ jobs:
           echo "Checking Claude output for MCP servers..."
 
           # Parse the JSON output
-          OUTPUT_FILE="/tmp/claude-execution-output.json"
+          OUTPUT_FILE="${RUNNER_TEMP}/claude-execution-output.json"
 
           if [ ! -f "$OUTPUT_FILE" ]; then
             echo "Error: Output file not found!"
