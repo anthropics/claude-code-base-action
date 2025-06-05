@@ -7,8 +7,8 @@ import { spawn } from "child_process";
 
 const execAsync = promisify(exec);
 
-const PIPE_PATH = `/${process.env.RUNNER_TEMP}/claude_prompt_pipe`;
-const EXECUTION_FILE = `/${process.env.RUNNER_TEMP}/claude-execution-output.json`;
+const PIPE_PATH = `${process.env.RUNNER_TEMP}/claude_prompt_pipe`;
+const EXECUTION_FILE = `${process.env.RUNNER_TEMP}/claude-execution-output.json`;
 const BASE_ARGS = ["-p", "--verbose", "--output-format", "stream-json"];
 
 export type ClaudeOptions = {
