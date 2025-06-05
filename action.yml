@@ -99,7 +99,7 @@ runs:
     - name: Install Dependencies
       shell: bash
       run: |
-        cd ${{ github.action_path }}
+        cd ${GITHUB_ACTION_PATH}
         bun install
 
     - name: Install Claude Code
@@ -115,7 +115,7 @@ runs:
           echo "Changing directory to CLAUDE_WORKING_DIR: $CLAUDE_WORKING_DIR"
           cd "$CLAUDE_WORKING_DIR"
         fi
-        bun run ${{ github.action_path }}/src/index.ts
+        bun run ${GITHUB_ACTION_PATH}/src/index.ts
       env:
         # Model configuration
         CLAUDE_CODE_ACTION: "1"
