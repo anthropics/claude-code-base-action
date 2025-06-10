@@ -17,9 +17,9 @@ export function validateEnvironmentVariables() {
 
   if (!useBedrock && !useVertex) {
     if (!anthropicApiKey) {
-      errors.push(
-        "ANTHROPIC_API_KEY is required when using direct Anthropic API.",
-      );
+      // errors.push(
+      //  "ANTHROPIC_API_KEY is required when using direct Anthropic API.",
+      // );
     }
   } else if (useBedrock) {
     const requiredBedrockVars = {
