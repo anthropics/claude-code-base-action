@@ -23,7 +23,11 @@ jobs:
       - name: Get latest tag
         id: get_latest_tag
         run: |
-          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          # Get only version tags (v + number pattern)
+          latest_tag=$(git tag -l 'v[0-9]*' | sort -V | tail -1 || echo "v0.0.0")
+          if [ -z "$latest_tag" ]; then
+            latest_tag="v0.0.0"
+          fi
           echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
           echo "Latest tag: $latest_tag"
 
