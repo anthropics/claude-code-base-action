@@ -1,0 +1,75 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (only show what would be created)"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+          echo "Latest tag: $latest_tag"
+
+      - name: Calculate next version
+        id: next_version
+        run: |
+          latest_tag="${{ steps.get_latest_tag.outputs.latest_tag }}"
+          # Remove 'v' prefix and split by dots
+          version=${latest_tag#v}
+          IFS='.' read -ra VERSION_PARTS <<< "$version"
+
+          # Increment patch version
+          major=${VERSION_PARTS[0]:-0}
+          minor=${VERSION_PARTS[1]:-0}
+          patch=${VERSION_PARTS[2]:-0}
+          patch=$((patch + 1))
+
+          next_version="v${major}.${minor}.${patch}"
+          echo "next_version=$next_version" >> $GITHUB_OUTPUT
+          echo "Next version: $next_version"
+
+      - name: Display dry run info
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "🔍 DRY RUN MODE"
+          echo "Would create tag: ${{ steps.next_version.outputs.next_version }}"
+          echo "From commit: ${{ github.sha }}"
+          echo "Previous tag: ${{ steps.get_latest_tag.outputs.latest_tag }}"
+
+      - name: Create and push tag
+        if: ${{ !inputs.dry_run }}
+        run: |
+          next_version="${{ steps.next_version.outputs.next_version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$next_version" -m "Release $next_version"
+          git push origin "$next_version"
+
+      - name: Create Release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          next_version="${{ steps.next_version.outputs.next_version }}"
+
+          gh release create "$next_version" \
+            --title "$next_version" \
+            --generate-notes
