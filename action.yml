@@ -48,7 +48,23 @@ inputs:
     description: "Custom environment variables to pass to Claude Code execution (YAML multiline format)"
     required: false
     default: ""
-
+  # OAuth設定
+  use_oauth:
+    description: "Use OAuth authentication for Claude Code"
+    required: false
+    default: "false"
+  claude_access_token:
+    description: "Claude OAuth access token"
+    required: false
+    default: ""
+  claude_refresh_token:
+    description: "Claude OAuth refresh token"
+    required: false
+    default: ""
+  claude_expires_at:
+    description: "Claude OAuth token expiration time"
+    required: false
+    default: ""
   # Action settings
   timeout_minutes:
     description: "Timeout in minutes for Claude Code execution"
