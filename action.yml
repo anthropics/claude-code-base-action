@@ -104,7 +104,7 @@ runs:
 
     - name: Install Claude Code
       shell: bash
-      run: npm install -g @anthropic-ai/claude-code@1.0.18
+      run: npm install -g @anthropic-ai/claude-code@1.0.19
 
     - name: Run Claude Code Action
       shell: bash
