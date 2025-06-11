@@ -76,4 +76,56 @@ jobs:
 
           gh release create "$next_version" \
             --title "$next_version" \
-            --generate-notes
+            --generate-notes \
+            --latest=false # We want to keep beta as the latest
+
+  update-beta-tag:
+    needs: create-release
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update beta tag
+        run: |
+          # Get the latest version tag
+          VERSION=$(git tag -l 'v[0-9]*' | sort -V | tail -1)
+
+          # Update the beta tag to point to this release
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -fa beta -m "Update beta tag to ${VERSION}"
+          git push origin beta --force
+
+      - name: Update beta release to be latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Update beta release to be marked as latest
+          gh release edit beta --latest
+
+  trigger-downstream-update:
+    needs: create-release
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger downstream action update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get the latest version tag
+          VERSION=$(gh api repos/${{ github.repository }}/tags --jq '.[0].name' | grep '^v[0-9]' || echo "")
+
+          if [ -n "$VERSION" ]; then
+            echo "Triggering downstream update for version: $VERSION"
+            gh workflow run update-downstream-action.yml \
+              --repo ${{ github.repository }} \
+              -f tag="$VERSION"
+          else
+            echo "Could not determine version tag, skipping downstream update"
+          fi

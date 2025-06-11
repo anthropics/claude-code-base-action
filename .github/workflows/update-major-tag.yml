@@ -22,3 +22,10 @@ jobs:
           git config user.email github-actions[bot]@users.noreply.github.com
           git tag -fa beta -m "Update beta tag to ${VERSION}"
           git push origin beta --force
+
+      - name: Update beta release to be latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Update beta release to be marked as latest
+          gh release edit beta --latest

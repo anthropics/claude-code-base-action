@@ -7,6 +7,12 @@ on:
   push:
     tags:
       - "v*.*.*" # Trigger on version tags like v1.2.3
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to update downstream action to (e.g., v1.2.3)"
+        required: true
+        type: string
 
 jobs:
   update-downstream:
@@ -23,8 +29,16 @@ jobs:
       - name: Get release information
         id: release_info
         run: |
-          # Get the tag name and SHA
-          TAG_NAME=${GITHUB_REF#refs/tags/}
+          # Get the tag name based on trigger type
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG_NAME="${{ inputs.tag }}"
+            # Checkout the specific tag
+            git fetch --tags
+            git checkout "refs/tags/${TAG_NAME}"
+          else
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+          fi
+
           TAG_SHA=$(git rev-parse HEAD)
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           echo "TAG_SHA=$TAG_SHA" >> $GITHUB_ENV
