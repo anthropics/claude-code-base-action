@@ -122,19 +122,6 @@ runs:
       shell: bash
       run: npm install -g @anthropic-ai/claude-code@1.0.17
 
-    - name: Setup Claude OAuth credentials
-      shell: bash
-      run: |
-        if [ "${{ inputs.use_oauth }}" = "true" ]; then
-          mkdir -p ~/.claude
-          cat > ~/.claude/.credentials.json << 'EOF'
-        {"claudeAiOauth":{"accessToken":"${{ inputs.claude_access_token }}","refreshToken":"${{ inputs.claude_refresh_token }}","expiresAt":${{ inputs.claude_expires_at }},"scopes":["user:inference","user:profile"],"isMax":false}}
-        EOF
-          echo "OAuth credentials file created at ~/.claude/.credentials.json"
-        else
-          echo "OAuth not enabled, skipping credentials setup"
-        fi
-
     - name: Run Claude Code Action
       shell: bash
       id: run_claude
