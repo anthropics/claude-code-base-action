@@ -1,60 +1,80 @@
 # CLAUDE.md
 
-## Common Commands
+## 共通コマンド
 
-### Development Commands
+### 開発コマンド
 
-- Build/Type check: `bun run typecheck`
-- Format code: `bun run format`
-- Check formatting: `bun run format:check`
-- Run tests: `bun test`
-- Install dependencies: `bun install`
+- ビルド/型チェック: `bun run typecheck`
+- コード整形: `bun run format`
+- 整形チェック: `bun run format:check`
+- テスト実行: `bun test`
+- 依存関係インストール: `bun install`
 
-### Action Testing
+### アクションテスト
 
-- Test action locally: `./test-local.sh`
-- Test specific file: `bun test test/prepare-prompt.test.ts`
+- アクションをローカルでテスト: `./test-local.sh`
+- 特定ファイルをテスト: `bun test test/prepare-prompt.test.ts`
 
-## Architecture Overview
+## アーキテクチャ概要
 
-This is a GitHub Action that allows running Claude Code within GitHub workflows. The action consists of:
+これはGitHubワークフロー内でClaude Codeを実行するためのGitHub Actionです。以下の要素で構成されています：
 
-### Core Components
+### 主要コンポーネント
 
-1. **Action Definition** (`action.yml`): Defines inputs, outputs, and the composite action steps
-2. **Prompt Preparation** (`src/index.ts`): Runs Claude Code with specified arguments
+1. **アクション定義** (`action.yml`): 入力、出力、および複合アクションステップを定義
+2. **プロンプト準備** (`src/index.ts`): 指定された引数でClaude Codeを実行
 
-### Key Design Patterns
+### 主要設計パターン
 
-- Uses Bun runtime for development and execution
-- Named pipes for IPC between prompt input and Claude process
-- JSON streaming output format for execution logs
-- Composite action pattern to orchestrate multiple steps
-- Provider-agnostic design supporting Anthropic API, AWS Bedrock, and Google Vertex AI
+- 開発と実行にBunランタイムを使用
+- プロンプト入力とClaudeプロセス間のIPCに名前付きパイプを使用
+- 実行ログのJSON ストリーミング出力形式
+- 複数ステップを統合する複合アクションパターン
+- Anthropic API、AWS Bedrock、Google Vertex AIをサポートするプロバイダー非依存設計
 
-## Provider Authentication
+## プロバイダー認証
 
-1. **Anthropic API** (default): Requires API key via `anthropic_api_key` input
-2. **AWS Bedrock**: Uses OIDC authentication when `use_bedrock: true`
-3. **Google Vertex AI**: Uses OIDC authentication when `use_vertex: true`
+1. **OAuth認証**: `use_oauth: true`時にClaude OAuthトークンを使用
+   - `claude_access_token`、`claude_refresh_token`、`claude_expires_at`の入力が必要
+   - Claude Code認証用に`~/.claude/.credentials.json`ファイルを作成
+2. **Anthropic API** (フォールバック): `anthropic_api_key`入力でAPIキーが必要
+3. **AWS Bedrock**: `use_bedrock: true`時にOIDC認証を使用
+4. **Google Vertex AI**: `use_vertex: true`時にOIDC認証を使用
 
-## Testing Strategy
+## テスト戦略
 
-### Local Testing
+### ローカルテスト
 
-- Use `act` tool to run GitHub Actions workflows locally
-- `test-local.sh` script automates local testing setup
-- Requires `ANTHROPIC_API_KEY` environment variable
+- GitHub Actionsワークフローをローカルで実行するために`act`ツールを使用
+- `test-local.sh`スクリプトがローカルテストセットアップを自動化
+- `ANTHROPIC_API_KEY`環境変数が必要
 
-### Test Structure
+### テスト構造
 
-- Unit tests for configuration logic
-- Integration tests for prompt preparation
-- Full workflow tests in `.github/workflows/test-action.yml`
+- 設定ロジックの単体テスト
+- プロンプト準備の統合テスト
+- `.github/workflows/test-action.yml`での完全ワークフローテスト
 
-## Important Technical Details
+## 重要な技術詳細
 
-- Uses `mkfifo` to create named pipes for prompt input
-- Outputs execution logs as JSON to `/tmp/claude-execution-output.json`
-- Timeout enforcement via `timeout` command wrapper
-- Strict TypeScript configuration with Bun-specific settings
+- プロンプト入力用の名前付きパイプ作成に`mkfifo`を使用
+- 実行ログを`/tmp/claude-execution-output.json`にJSON形式で出力
+- `timeout`コマンドラッパーによるタイムアウト制御
+- Bun固有設定での厳密なTypeScript設定
+
+## フォーク状況
+
+これはOAuth認証サポートを追加した[anthropics/claude-code-base-action](https://github.com/anthropics/claude-code-base-action)の独立フォークです。
+
+### アップストリームとの主な違い
+
+- **OAuth認証**: Claude OAuthトークンのサポートを追加（アップストリームはこの機能を削除）
+- **セキュリティ強化**: より良いセキュリティのためAPIキーよりOAuthトークンを優先
+- **独立メンテナンス**: アップストリームがAPIキー認証に焦点を当てる一方、このフォークはOAuth機能を維持
+
+### アップストリーム同期戦略
+
+- バグ修正と有用な機能についてアップストリームを監視
+- 競合しない改善を選択的にマージ
+- 主要な差別化要因としてOAuth認証を維持
+- OAuth機能を削除する自動マージを回避
