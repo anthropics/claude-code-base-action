@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      next_version: ${{ steps.next_version.outputs.next_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -113,19 +115,24 @@ jobs:
     needs: create-release
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Trigger downstream action update
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # Get the latest version tag
-          VERSION=$(gh api repos/${{ github.repository }}/tags --jq '.[0].name' | grep '^v[0-9]' || echo "")
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const version = '${{ needs.create-release.outputs.next_version }}';
+            console.log(`Triggering downstream update for version: ${version}`);
 
-          if [ -n "$VERSION" ]; then
-            echo "Triggering downstream update for version: $VERSION"
-            gh workflow run update-downstream-action.yml \
-              --repo ${{ github.repository }} \
-              -f tag="$VERSION"
-          else
-            echo "Could not determine version tag, skipping downstream update"
-          fi
+            await github.rest.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'update-downstream-action',
+              client_payload: {
+                tag: version
+              }
+            });
+
+            console.log('Successfully triggered downstream update');

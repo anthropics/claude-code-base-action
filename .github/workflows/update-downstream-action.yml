@@ -13,6 +13,8 @@ on:
         description: "Tag to update downstream action to (e.g., v1.2.3)"
         required: true
         type: string
+  repository_dispatch:
+    types: [update-downstream-action]
 
 jobs:
   update-downstream:
@@ -32,6 +34,11 @@ jobs:
           # Get the tag name based on trigger type
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             TAG_NAME="${{ inputs.tag }}"
+            # Checkout the specific tag
+            git fetch --tags
+            git checkout "refs/tags/${TAG_NAME}"
+          elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            TAG_NAME="${{ github.event.client_payload.tag }}"
             # Checkout the specific tag
             git fetch --tags
             git checkout "refs/tags/${TAG_NAME}"
