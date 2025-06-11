@@ -1,5 +1,5 @@
-name: "Claude Code Base Action"
-description: "Run Claude Code in GitHub Actions workflows"
+name: "Claude Max Code Base Action"
+description: "Run Claude Code in GitHub Actions workflows with your Claude Max subscription."
 branding:
   icon: "code"
   color: "orange"
@@ -68,6 +68,22 @@ inputs:
     description: "Use Google Vertex AI with OIDC authentication instead of direct Anthropic API"
     required: false
     default: "false"
+  use_oauth:
+    description: "Use Claude AI OAuth authentication instead of API key"
+    required: false
+    default: "false"
+  claude_access_token:
+    description: "Claude AI OAuth access token (required when use_oauth is true)"
+    required: false
+    default: ""
+  claude_refresh_token:
+    description: "Claude AI OAuth refresh token (required when use_oauth is true)"
+    required: false
+    default: ""
+  claude_expires_at:
+    description: "Claude AI OAuth token expiration timestamp (required when use_oauth is true)"
+    required: false
+    default: ""
 
   use_node_cache:
     description: "Whether to use Node.js dependency caching (set to true only for Node.js projects with lock files)"
@@ -137,6 +153,12 @@ runs:
         # Only set provider flags if explicitly true, since any value (including "false") is truthy
         CLAUDE_CODE_USE_BEDROCK: ${{ inputs.use_bedrock == 'true' && '1' || '' }}
         CLAUDE_CODE_USE_VERTEX: ${{ inputs.use_vertex == 'true' && '1' || '' }}
+        CLAUDE_CODE_USE_OAUTH: ${{ inputs.use_oauth == 'true' && '1' || '' }}
+
+        # OAuth configuration
+        CLAUDE_ACCESS_TOKEN: ${{ inputs.claude_access_token }}
+        CLAUDE_REFRESH_TOKEN: ${{ inputs.claude_refresh_token }}
+        CLAUDE_EXPIRES_AT: ${{ inputs.claude_expires_at }}
 
         # AWS configuration
         AWS_REGION: ${{ env.AWS_REGION }}
