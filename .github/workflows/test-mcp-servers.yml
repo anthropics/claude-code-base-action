@@ -96,23 +96,13 @@ jobs:
         run: |
           echo "=== Environment Variables (--mcp-config test) ==="
           echo "HOME: $HOME"
-          echo "XDG_CONFIG_HOME: ${XDG_CONFIG_HOME:-not set}"
-          echo "CLAUDE_CONFIG_DIR: ${CLAUDE_CONFIG_DIR:-not set}"
           echo ""
           echo "=== Expected Config Paths ==="
           echo "GitHub action writes to: $HOME/.claude/settings.json"
-          if [ -n "${XDG_CONFIG_HOME:-}" ]; then
-            echo "Claude might read from: $XDG_CONFIG_HOME/claude/settings.json"
-          else
-            echo "Claude should read from: $HOME/.claude/settings.json"
-          fi
+          echo "Claude should read from: $HOME/.claude/settings.json"
           echo ""
           echo "=== Actual File System ==="
           ls -la $HOME/.claude/ || echo "No $HOME/.claude directory"
-          if [ -n "${XDG_CONFIG_HOME:-}" ]; then
-            ls -la $XDG_CONFIG_HOME/ || echo "No $XDG_CONFIG_HOME directory"
-            ls -la $XDG_CONFIG_HOME/claude/ || echo "No $XDG_CONFIG_HOME/claude directory"
-          fi
 
       - name: Run Claude Code with --mcp-config flag
         uses: ./
