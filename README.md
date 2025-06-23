@@ -93,8 +93,8 @@ Add the following to your workflow file:
 | `system_prompt`        | Override system prompt                                                                            | No       | ''                           |
 | `append_system_prompt` | Append to system prompt                                                                           | No       | ''                           |
 | `claude_env`           | Custom environment variables to pass to Claude Code execution (YAML multiline format)             | No       | ''                           |
-| `model`                | Model to use (provider-specific format required for Bedrock/Vertex)                               | No       | 'claude-3-7-sonnet-20250219' |
-| `anthropic_model`      | DEPRECATED: Use 'model' instead                                                                   | No       | 'claude-3-7-sonnet-20250219' |
+| `model`                | Model to use (provider-specific format required for Bedrock/Vertex)                               | No       | 'claude-4-0-sonnet-20250219' |
+| `anthropic_model`      | DEPRECATED: Use 'model' instead                                                                   | No       | 'claude-4-0-sonnet-20250219' |
 | `timeout_minutes`      | Timeout in minutes for Claude Code execution                                                      | No       | '10'                         |
 | `anthropic_api_key`    | Anthropic API key (required for direct Anthropic API)                                             | No       | ''                           |
 | `use_bedrock`          | Use Amazon Bedrock with OIDC authentication instead of direct Anthropic API                       | No       | 'false'                      |

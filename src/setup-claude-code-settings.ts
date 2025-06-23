@@ -1,14 +1,29 @@
 import { $ } from "bun";
 import { homedir } from "os";
+import { join } from "path";
+
+/**
+ * Get Claude's config directory using XDG path when available
+ * Priority order:
+ * 1. XDG_CONFIG_HOME/claude (XDG Base Directory spec)
+ * 2. ~/.claude (legacy fallback)
+ */
+function getClaudeConfigHomeDir(): string {
+  if (process.env.XDG_CONFIG_HOME) {
+    return join(process.env.XDG_CONFIG_HOME, "claude");
+  }
+
+  return join(homedir(), ".claude");
+}
 
 export async function setupClaudeCodeSettings() {
-  const home = homedir();
-  const settingsPath = `${home}/.claude/settings.json`;
+  const configDir = getClaudeConfigHomeDir();
+  const settingsPath = join(configDir, "settings.json");
   console.log(`Setting up Claude settings at: ${settingsPath}`);
 
-  // Ensure .claude directory exists
-  console.log(`Creating .claude directory...`);
-  await $`mkdir -p ${home}/.claude`.quiet();
+  // Ensure config directory exists
+  console.log(`Creating config directory...`);
+  await $`mkdir -p ${configDir}`.quiet();
 
   let settings: Record<string, unknown> = {};
   try {
