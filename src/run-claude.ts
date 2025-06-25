@@ -19,6 +19,7 @@ export type ClaudeOptions = {
   systemPrompt?: string;
   appendSystemPrompt?: string;
   claudeEnv?: string;
+  fallbackModel?: string;
 };
 
 type PreparedConfig = {
@@ -88,6 +89,9 @@ export function prepareRunConfig(
   }
   if (options.appendSystemPrompt) {
     claudeArgs.push("--append-system-prompt", options.appendSystemPrompt);
+  }
+  if (options.fallbackModel) {
+    claudeArgs.push("--fallback-model", options.fallbackModel);
   }
 
   // Parse custom environment variables

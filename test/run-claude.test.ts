@@ -86,6 +86,16 @@ describe("prepareRunConfig", () => {
     );
   });
 
+  test("should include fallback model in command arguments", () => {
+    const options: ClaudeOptions = {
+      fallbackModel: "claude-sonnet-4-20250514",
+    };
+    const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+
+    expect(prepared.claudeArgs).toContain("--fallback-model");
+    expect(prepared.claudeArgs).toContain("claude-sonnet-4-20250514");
+  });
+
   test("should use provided prompt path", () => {
     const options: ClaudeOptions = {};
     const prepared = prepareRunConfig("/custom/prompt/path.txt", options);
@@ -103,6 +113,7 @@ describe("prepareRunConfig", () => {
     expect(prepared.claudeArgs).not.toContain("--mcp-config");
     expect(prepared.claudeArgs).not.toContain("--system-prompt");
     expect(prepared.claudeArgs).not.toContain("--append-system-prompt");
+    expect(prepared.claudeArgs).not.toContain("--fallback-model");
   });
 
   test("should preserve order of claude arguments", () => {
@@ -121,6 +132,40 @@ describe("prepareRunConfig", () => {
       "Bash,Read",
       "--max-turns",
       "3",
+    ]);
+  });
+
+  test("should preserve order with all options including fallback model", () => {
+    const options: ClaudeOptions = {
+      allowedTools: "Bash,Read",
+      disallowedTools: "Write",
+      maxTurns: "3",
+      mcpConfig: "/path/to/config.json",
+      systemPrompt: "You are a helpful assistant",
+      appendSystemPrompt: "Be concise",
+      fallbackModel: "claude-sonnet-4-20250514",
+    };
+    const prepared = prepareRunConfig("/tmp/test-prompt.txt", options);
+
+    expect(prepared.claudeArgs).toEqual([
+      "-p",
+      "--verbose",
+      "--output-format",
+      "stream-json",
+      "--allowedTools",
+      "Bash,Read",
+      "--disallowedTools",
+      "Write",
+      "--max-turns",
+      "3",
+      "--mcp-config",
+      "/path/to/config.json",
+      "--system-prompt",
+      "You are a helpful assistant",
+      "--append-system-prompt",
+      "Be concise",
+      "--fallback-model",
+      "claude-sonnet-4-20250514",
     ]);
   });
 

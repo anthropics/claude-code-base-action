@@ -25,6 +25,7 @@ async function run() {
       systemPrompt: process.env.INPUT_SYSTEM_PROMPT,
       appendSystemPrompt: process.env.INPUT_APPEND_SYSTEM_PROMPT,
       claudeEnv: process.env.INPUT_CLAUDE_ENV,
+      fallbackModel: process.env.INPUT_FALLBACK_MODEL,
     });
   } catch (error) {
     core.setFailed(`Action failed with error: ${error}`);
