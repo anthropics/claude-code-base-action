@@ -199,6 +199,34 @@ describe("prepareRunConfig", () => {
     });
   });
 
+  describe("timeoutMinutes validation", () => {
+    test("should accept valid timeoutMinutes value", () => {
+      const options: ClaudeOptions = { timeoutMinutes: "15" };
+      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).not.toThrow();
+    });
+
+    test("should throw error for non-numeric timeoutMinutes", () => {
+      const options: ClaudeOptions = { timeoutMinutes: "abc" };
+      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
+        "timeoutMinutes must be a positive number, got: abc",
+      );
+    });
+
+    test("should throw error for negative timeoutMinutes", () => {
+      const options: ClaudeOptions = { timeoutMinutes: "-5" };
+      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
+        "timeoutMinutes must be a positive number, got: -5",
+      );
+    });
+
+    test("should throw error for zero timeoutMinutes", () => {
+      const options: ClaudeOptions = { timeoutMinutes: "0" };
+      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).toThrow(
+        "timeoutMinutes must be a positive number, got: 0",
+      );
+    });
+  });
+
   describe("custom environment variables", () => {
     test("should parse empty claudeEnv correctly", () => {
       const options: ClaudeOptions = { claudeEnv: "" };

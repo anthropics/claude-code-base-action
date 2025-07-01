@@ -20,6 +20,7 @@ export type ClaudeOptions = {
   appendSystemPrompt?: string;
   claudeEnv?: string;
   fallbackModel?: string;
+  timeoutMinutes?: string;
 };
 
 type PreparedConfig = {
@@ -92,6 +93,14 @@ export function prepareRunConfig(
   }
   if (options.fallbackModel) {
     claudeArgs.push("--fallback-model", options.fallbackModel);
+  }
+  if (options.timeoutMinutes) {
+    const timeoutMinutesNum = parseInt(options.timeoutMinutes, 10);
+    if (isNaN(timeoutMinutesNum) || timeoutMinutesNum <= 0) {
+      throw new Error(
+        `timeoutMinutes must be a positive number, got: ${options.timeoutMinutes}`,
+      );
+    }
   }
 
   // Parse custom environment variables
@@ -209,8 +218,18 @@ export async function runClaude(promptPath: string, options: ClaudeOptions) {
   });
 
   // Wait for Claude to finish with timeout
-  const timeoutMs =
-    parseInt(process.env.INPUT_TIMEOUT_MINUTES || "10") * 60 * 1000;
+  let timeoutMs = 10 * 60 * 1000; // Default 10 minutes
+  if (options.timeoutMinutes) {
+    timeoutMs = parseInt(options.timeoutMinutes, 10) * 60 * 1000;
+  } else if (process.env.INPUT_TIMEOUT_MINUTES) {
+    const envTimeout = parseInt(process.env.INPUT_TIMEOUT_MINUTES, 10);
+    if (isNaN(envTimeout) || envTimeout <= 0) {
+      throw new Error(
+        `INPUT_TIMEOUT_MINUTES must be a positive number, got: ${process.env.INPUT_TIMEOUT_MINUTES}`,
+      );
+    }
+    timeoutMs = envTimeout * 60 * 1000;
+  }
   const exitCode = await new Promise<number>((resolve) => {
     let resolved = false;
 
