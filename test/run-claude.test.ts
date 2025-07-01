@@ -202,7 +202,9 @@ describe("prepareRunConfig", () => {
   describe("timeoutMinutes validation", () => {
     test("should accept valid timeoutMinutes value", () => {
       const options: ClaudeOptions = { timeoutMinutes: "15" };
-      expect(() => prepareRunConfig("/tmp/test-prompt.txt", options)).not.toThrow();
+      expect(() =>
+        prepareRunConfig("/tmp/test-prompt.txt", options),
+      ).not.toThrow();
     });
 
     test("should throw error for non-numeric timeoutMinutes", () => {
