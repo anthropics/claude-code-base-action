@@ -84,7 +84,7 @@ Add the following to your workflow file:
 | `allowed_tools`        | Comma-separated list of allowed tools for Claude Code to use                                      | No       | ''                           |
 | `disallowed_tools`     | Comma-separated list of disallowed tools that Claude Code cannot use                              | No       | ''                           |
 | `max_turns`            | Maximum number of conversation turns (default: no limit)                                          | No       | ''                           |
-| `mcp_config`           | Path to the MCP configuration JSON file                                                           | No       | ''                           |
+| `mcp_config`           | Path to the MCP configuration JSON file, or MCP configuration JSON string                         | No       | ''                           |
 | `system_prompt`        | Override system prompt                                                                            | No       | ''                           |
 | `append_system_prompt` | Append to system prompt                                                                           | No       | ''                           |
 | `claude_env`           | Custom environment variables to pass to Claude Code execution (YAML multiline format)             | No       | ''                           |
@@ -180,14 +180,43 @@ claude_env: |
 
 ## Using MCP Config
 
-You can provide a custom MCP configuration file to dynamically load MCP servers:
+You can provide MCP configuration in two ways:
+
+### Option 1: MCP Configuration File
+
+Provide a path to a JSON file containing MCP configuration:
 
 ```yaml
-- name: Run Claude Code with MCP config
+- name: Run Claude Code with MCP config file
   uses: anthropics/claude-code-base-action@beta
   with:
     prompt: "Your prompt here"
     mcp_config: "path/to/mcp-config.json"
+    allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool"
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### Option 2: Inline MCP Configuration
+
+Provide the MCP configuration directly as a JSON string:
+
+```yaml
+- name: Run Claude Code with inline MCP config
+  uses: anthropics/claude-code-base-action@beta
+  with:
+    prompt: "Your prompt here"
+    mcp_config: |
+      {
+        "mcpServers": {
+          "server-name": {
+            "command": "node",
+            "args": ["./server.js"],
+            "env": {
+              "API_KEY": "your-api-key"
+            }
+          }
+        }
+      }
     allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool"
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
