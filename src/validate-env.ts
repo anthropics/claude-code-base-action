@@ -6,6 +6,7 @@ export function validateEnvironmentVariables() {
   const useBedrock = process.env.CLAUDE_CODE_USE_BEDROCK === "1";
   const useVertex = process.env.CLAUDE_CODE_USE_VERTEX === "1";
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+  const claudeCodeOAuthToken = process.env.CLAUDE_CODE_OAUTH_TOKEN;
 
   const errors: string[] = [];
 
@@ -16,9 +17,9 @@ export function validateEnvironmentVariables() {
   }
 
   if (!useBedrock && !useVertex) {
-    if (!anthropicApiKey) {
+    if (!anthropicApiKey && !claudeCodeOAuthToken) {
       errors.push(
-        "ANTHROPIC_API_KEY is required when using direct Anthropic API.",
+        "Either ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN is required when using direct Anthropic API.",
       );
     }
   } else if (useBedrock) {

@@ -38,7 +38,7 @@ describe("validateEnvironmentVariables", () => {
 
     test("should fail when ANTHROPIC_API_KEY is missing", () => {
       expect(() => validateEnvironmentVariables()).toThrow(
-        "ANTHROPIC_API_KEY is required when using direct Anthropic API.",
+        "Either ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN is required when using direct Anthropic API.",
       );
     });
   });
