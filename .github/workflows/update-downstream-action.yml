@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout current repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0
 
@@ -33,12 +33,12 @@ jobs:
         run: |
           # Get the tag name based on trigger type
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG_NAME="${{ inputs.tag }}"
+            TAG_NAME="${INPUT_TAG}"
             # Checkout the specific tag
             git fetch --tags
             git checkout "refs/tags/${TAG_NAME}"
           elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            TAG_NAME="${{ github.event.client_payload.tag }}"
+            TAG_NAME="${CLIENT_PAYLOAD_TAG}"
             # Checkout the specific tag
             git fetch --tags
             git checkout "refs/tags/${TAG_NAME}"
@@ -51,6 +51,9 @@ jobs:
           echo "TAG_SHA=$TAG_SHA" >> $GITHUB_ENV
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "tag_sha=$TAG_SHA" >> $GITHUB_OUTPUT
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          CLIENT_PAYLOAD_TAG: ${{ github.event.client_payload.tag }}
 
       - name: Clone claude-code-action repository
         run: |
