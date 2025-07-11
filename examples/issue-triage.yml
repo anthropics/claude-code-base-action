@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0
 
@@ -51,7 +51,7 @@ jobs:
           IMPORTANT: Don't post any comments or messages to the issue. Your only action should be to apply labels.
 
           Issue Information:
-          - REPO: ${{ github.repository }}
+          - REPO: ${GITHUB_REPOSITORY}
           - ISSUE_NUMBER: ${{ github.event.issue.number }}
 
           TASK OVERVIEW:
@@ -95,6 +95,8 @@ jobs:
           - Your ONLY action should be to apply labels using mcp__github__update_issue
           - It's okay to not add any labels if none are clearly applicable
           EOF
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Run Claude Code for Issue Triage
         uses: anthropics/claude-code-base-action@beta

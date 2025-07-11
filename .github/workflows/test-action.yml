@@ -16,7 +16,7 @@ jobs:
   test-inline-prompt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Test with inline prompt
         id: inline-test
@@ -66,13 +66,15 @@ jobs:
   test-prompt-file:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Create test prompt file
         run: |
           cat > test-prompt.txt << EOF
-          ${{ github.event.inputs.test_prompt || 'List the files in the current directory starting with "package"' }}
+          ${PROMPT}
           EOF
+        env:
+          PROMPT: ${{ github.event.inputs.test_prompt || 'List the files in the current directory starting with "package"' }}
 
       - name: Test with prompt file and allowed tools
         id: prompt-file-test

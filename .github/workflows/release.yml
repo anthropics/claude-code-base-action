@@ -119,7 +119,7 @@ jobs:
       contents: write
     steps:
       - name: Trigger downstream action update
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
