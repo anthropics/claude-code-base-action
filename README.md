@@ -93,6 +93,7 @@ Add the following to your workflow file:
 | `disallowed_tools`        | Comma-separated list of disallowed tools that Claude Code cannot use                              | No       | ''                           |
 | `max_turns`               | Maximum number of conversation turns (default: no limit)                                          | No       | ''                           |
 | `mcp_config`              | Path to the MCP configuration JSON file, or MCP configuration JSON string                         | No       | ''                           |
+| `settings`                | Path to Claude Code settings JSON file, or settings JSON string                                   | No       | ''                           |
 | `system_prompt`           | Override system prompt                                                                            | No       | ''                           |
 | `append_system_prompt`    | Append to system prompt                                                                           | No       | ''                           |
 | `claude_env`              | Custom environment variables to pass to Claude Code execution (YAML multiline format)             | No       | ''                           |
@@ -186,6 +187,69 @@ claude_env: |
   MAX_RETRIES: 3
   TIMEOUT_MS: 5000
 ```
+
+## Using Settings Configuration
+
+You can provide Claude Code settings configuration in two ways:
+
+### Option 1: Settings Configuration File
+
+Provide a path to a JSON file containing Claude Code settings:
+
+```yaml
+- name: Run Claude Code with settings file
+  uses: anthropics/claude-code-base-action@beta
+  with:
+    prompt: "Your prompt here"
+    settings: "path/to/settings.json"
+    allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool"
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### Option 2: Inline Settings Configuration
+
+Provide the settings configuration directly as a JSON string:
+
+```yaml
+- name: Run Claude Code with inline settings
+  uses: anthropics/claude-code-base-action@beta
+  with:
+    prompt: "Your prompt here"
+    settings: |
+      {
+        "model": "claude-opus-4-20250514",
+        "env": {
+          "DEBUG": "true",
+          "API_URL": "https://api.example.com"
+        },
+        "permissions": {
+          "allow": ["Bash", "Read"],
+          "deny": ["WebFetch"]
+        },
+        "hooks": {
+          "PreToolUse": [{
+            "matcher": "Bash",
+            "hooks": [{
+              "type": "command",
+              "command": "echo Running bash command..."
+            }]
+          }]
+        }
+      }
+    allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool"
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+The settings file supports all Claude Code settings options including:
+
+- `model`: Override the default model
+- `env`: Environment variables for the session
+- `permissions`: Tool usage permissions
+- `hooks`: Pre/post tool execution hooks
+- `includeCoAuthoredBy`: Include co-authored-by in git commits
+- And more...
+
+**Note**: The `enableAllProjectMcpServers` setting is always set to `true` by this action to ensure MCP servers work correctly.
 
 ## Using MCP Config
 
