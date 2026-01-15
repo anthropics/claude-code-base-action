@@ -2,7 +2,7 @@
 
 This repository is an automated mirror of the `base-action` directory from [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action).
 
-However, the github releases (https://github.com/anthropics/claude-code-base-action/releases) are not synced, so if you use this, you will get an outdated version of claude code.
+However, the github releases (https://github.com/anthropics/claude-code-base-action/releases) are not synced, so if you use this, you will get an outdated version of Claude Code.
 
 **Do not use this repository.** Instead, please use or contribute to the main repository:
 
