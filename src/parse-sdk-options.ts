@@ -233,11 +233,28 @@ export function parseSdkOptions(options: ClaudeOptions): ParsedSdkOptions {
     };
   }
 
+  // Parse and validate maxTurns
+  let maxTurns: number | undefined;
+  if (options.maxTurns) {
+    const parsed = parseInt(options.maxTurns, 10);
+    if (Number.isNaN(parsed)) {
+      throw new Error(
+        `Invalid max_turns value: "${options.maxTurns}". Must be a valid integer.`,
+      );
+    }
+    if (parsed < 0) {
+      throw new Error(
+        `Invalid max_turns value: "${options.maxTurns}". Must be a non-negative integer.`,
+      );
+    }
+    maxTurns = parsed;
+  }
+
   // Build SDK options - use merged tools from both direct options and claudeArgs
   const sdkOptions: SdkOptions = {
     // Direct options from ClaudeOptions inputs
     model: options.model,
-    maxTurns: options.maxTurns ? parseInt(options.maxTurns, 10) : undefined,
+    maxTurns,
     allowedTools:
       mergedAllowedTools.length > 0 ? mergedAllowedTools : undefined,
     disallowedTools:
