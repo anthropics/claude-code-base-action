@@ -16,7 +16,7 @@ export type ClaudeRunResult = {
   structuredOutput?: string;
 };
 
-const EXECUTION_FILE = `${process.env.RUNNER_TEMP}/claude-execution-output.json`;
+const EXECUTION_FILE = `${process.env.RUNNER_TEMP || "/tmp"}/claude-execution-output.json`;
 
 /** Filename for the user request file, written by prompt generation */
 const USER_REQUEST_FILENAME = "claude-user-request.txt";
