@@ -55,6 +55,10 @@ inputs:
     description: "Optional path to a custom Claude Code executable. If provided, skips automatic installation and uses this executable instead. WARNING: Using an older version may cause problems if the action begins taking advantage of new Claude Code features. This input is typically not needed unless you're debugging something specific or have unique needs in your environment."
     required: false
     default: ""
+  claude_code_version:
+    description: "Claude Code CLI version to install. If not provided, defaults to the version pinned in this action. Useful for pinning a specific version or testing with a newer release."
+    required: false
+    default: ""
   path_to_bun_executable:
     description: "Optional path to a custom Bun executable. If provided, skips automatic Bun installation and uses this executable instead. WARNING: Using an incompatible version may cause problems if the action requires specific Bun features. This input is typically not needed unless you're debugging something specific or have unique needs in your environment."
     required: false
@@ -122,9 +126,10 @@ runs:
       shell: bash
       env:
         PATH_TO_CLAUDE_CODE_EXECUTABLE: ${{ inputs.path_to_claude_code_executable }}
+        INPUT_CLAUDE_CODE_VERSION: ${{ inputs.claude_code_version }}
       run: |
         if [ -z "$PATH_TO_CLAUDE_CODE_EXECUTABLE" ]; then
-          CLAUDE_CODE_VERSION="2.1.100"
+          CLAUDE_CODE_VERSION="${INPUT_CLAUDE_CODE_VERSION:-2.1.100}"
           echo "Installing Claude Code v${CLAUDE_CODE_VERSION}..."
           for attempt in 1 2 3; do
             echo "Installation attempt $attempt..."
