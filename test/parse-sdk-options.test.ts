@@ -298,6 +298,56 @@ describe("parseSdkOptions", () => {
     });
   });
 
+  describe("maxTurns validation", () => {
+    test("should parse valid maxTurns value", () => {
+      const options: ClaudeOptions = {
+        maxTurns: "5",
+      };
+
+      const result = parseSdkOptions(options);
+
+      expect(result.sdkOptions.maxTurns).toBe(5);
+    });
+
+    test("should return undefined maxTurns when not provided", () => {
+      const options: ClaudeOptions = {};
+
+      const result = parseSdkOptions(options);
+
+      expect(result.sdkOptions.maxTurns).toBeUndefined();
+    });
+
+    test("should throw error for non-numeric maxTurns", () => {
+      const options: ClaudeOptions = {
+        maxTurns: "abc",
+      };
+
+      expect(() => parseSdkOptions(options)).toThrow(
+        'Invalid max_turns value: "abc". Must be a valid integer.',
+      );
+    });
+
+    test("should throw error for negative maxTurns", () => {
+      const options: ClaudeOptions = {
+        maxTurns: "-5",
+      };
+
+      expect(() => parseSdkOptions(options)).toThrow(
+        'Invalid max_turns value: "-5". Must be a non-negative integer.',
+      );
+    });
+
+    test("should parse maxTurns with leading/trailing text as NaN and throw", () => {
+      const options: ClaudeOptions = {
+        maxTurns: "ten",
+      };
+
+      expect(() => parseSdkOptions(options)).toThrow(
+        'Invalid max_turns value: "ten". Must be a valid integer.',
+      );
+    });
+  });
+
   describe("other extraArgs passthrough", () => {
     test("should pass through json-schema in extraArgs", () => {
       const options: ClaudeOptions = {
